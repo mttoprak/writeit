@@ -43,7 +43,7 @@ app.use(morgan("common"));
 
 // DEV: herkese izin ver (credentials ile uyumlu: origin true)
 const corsOptions = {
-    origin: true,
+    origin: "https://writeit.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

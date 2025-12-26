@@ -77,12 +77,25 @@ export const AuthContextProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        await api.post("/auth/logout");
-        localStorage.removeItem("hasAutoRedirectedToApp");
-        setCurrentUser(null);
+        try {
+            // Backend'e "çerezi sil" komutu gönderiyoruz
+            // api instance'ında 'withCredentials: true' olduğundan emin ol
+            await api.post("/auth/logout");
 
-        // Logout sonrası bir sonraki girişte /users/me tekrar çalışabilsin
-        resolvedOnceRef.current = false;
+            // Frontend temizliği
+            localStorage.removeItem("hasAutoRedirectedToApp");
+            setCurrentUser(null);
+
+            // Logout sonrası bir sonraki girişte /users/me tekrar çalışabilsin
+            resolvedOnceRef.current = false;
+
+        } catch (err) {
+            // Logout sırasında hata olsa bile kullanıcıyı çıkış yapmış gibi göstermek
+            // genellikle iyi bir deneyimdir, ama hatayı loglayabilirsin.
+            console.error("Logout error:", err);
+            setCurrentUser(null);
+            resolvedOnceRef.current = false;
+        }
     };
 
     const updateCurrentUser = (data) => {
