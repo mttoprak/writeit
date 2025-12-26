@@ -1,13 +1,13 @@
 # WriteIt Uygulamasını Hostlama Rehberi
 
-Bu rehber, uygulamanızı **Frontend için Vercel** ve **Backend için Render** kullanarak nasıl ücretsiz bir şekilde yayınlayacağınızı anlatır.
+Bu rehber, uygulamanızı **Frontend için Netlify** ve **Backend için Render** kullanarak nasıl ücretsiz bir şekilde yayınlayacağınızı anlatır.
 
 ## 1. Hazırlık
 
 Projenizde gerekli kod değişiklikleri yapıldı:
 - **Backend:** Port numarası dinamik hale getirildi (`process.env.PORT`).
 - **Frontend:** API adresi environment variable (`VITE_API_URL`) üzerinden alınacak şekilde ayarlandı.
-- **Frontend:** Vercel için `vercel.json` dosyası oluşturuldu (Sayfa yenilemelerinde 404 hatasını önlemek için).
+- **Frontend (Netlify):** Netlify'da sayfa yenilemelerinde 404 hatası almamak için `client/public/_redirects` dosyası oluşturuldu.
 
 Kodlarınızı GitHub'a yüklediğinizden emin olun (Frontend ve Backend aynı repoda olabilir).
 
@@ -15,7 +15,7 @@ Kodlarınızı GitHub'a yüklediğinizden emin olun (Frontend ve Backend aynı r
 
 ## 2. Backend'i Hostlama (Render.com)
 
-Backend servisiniz Node.js ve Express kullanıyor. Render bu tür servisler için harika bir seçenektir.
+Backend servisiniz Node.js ve Express kullanıyor. Render bu tür servisler için harika ve ücretsiz bir seçenektir.
 
 1.  [Render.com](https://render.com/) adresine gidin ve GitHub hesabınızla giriş yapın.
 2.  **"New +"** butonuna tıklayın ve **"Web Service"** seçeneğini seçin.
@@ -28,49 +28,51 @@ Backend servisiniz Node.js ve Express kullanıyor. Render bu tür servisler içi
     *   **Runtime:** `Node`
     *   **Build Command:** `npm install`
     *   **Start Command:** `node index.js`
+    *   **Instance Type:** Free
 5.  **Environment Variables** bölümüne gidin ve şunları ekleyin:
     *   `MONGO_URI`: (MongoDB Atlas bağlantı adresiniz - `.env` dosyanızdaki değer)
     *   `JWT_SECRET`: (Gizli anahtarınız - `.env` dosyanızdaki değer)
+    *   `CLIENT_URL`: (Frontend URL'inizi buraya daha sonra ekleyebilirsiniz veya `*` yapabilirsiniz, şimdilik boş bırakabilir veya Netlify URL'ini alınca güncelleyebilirsiniz. Kodda `origin: true` olduğu için sorun olmayacaktır.)
 6.  **"Create Web Service"** butonuna tıklayın.
 
 Render backend'inizi derleyip başlatacaktır. İşlem bittiğinde size `https://writeit-api.onrender.com` gibi bir URL verecektir. **Bu URL'i kopyalayın.**
 
+*Not: Render ücretsiz planında servis kullanılmadığında uyku moduna geçer, bu yüzden ilk istekte açılması 30-60 saniye sürebilir.*
+
 ---
 
-## 3. Frontend'i Hostlama (Vercel)
+## 3. Frontend'i Hostlama (Netlify)
 
-Frontend React ve Vite kullanıyor. Vercel bu yapı için en iyi seçenektir.
+Frontend React ve Vite kullanıyor. Netlify, statik siteler ve SPA'lar için mükemmel ve ücretsiz bir servistir.
 
-1.  [Vercel.com](https://vercel.com/) adresine gidin ve GitHub hesabınızla giriş yapın.
-2.  **"Add New..."** -> **"Project"** seçeneğine tıklayın.
-3.  GitHub reponuzu seçin ve **"Import"** deyin.
-4.  **Configure Project** ekranında:
-    *   **Framework Preset:** `Vite` (Otomatik seçilmeli).
-    *   **Root Directory:** `Edit` butonuna basın ve `client` klasörünü seçin. (Çok önemli! Frontend dosyalarınız `client` klasöründe).
-5.  **Environment Variables** bölümünü açın ve şunu ekleyin:
-    *   **Name:** `VITE_API_URL`
-    *   **Value:** Render'dan aldığınız Backend URL'i (örn: `https://writeit-api.onrender.com`)
-        *   *Not: Sonunda `/api` eklemenize gerek yok, kodda zaten ekleniyor olabilir ama `client/src/services/api.js` dosyasını kontrol ederseniz `baseURL` kısmında `/api` olup olmadığına göre URL'i düzenleyin. Mevcut kodunuzda `/api` backend URL'ine dahil değilse, buraya `https://writeit-api.onrender.com` yazın. Eğer kodda `baseURL: import.meta.env.VITE_API_URL || ...` varsa ve backend route'larınız `/api` ile başlıyorsa, Vercel'e `https://writeit-api.onrender.com` verip kodda `/api` eklemesi yapmıyorsanız, URL'i `https://writeit-api.onrender.com/api` olarak girmeniz gerekebilir. Kodunuzu kontrol ettim, `client/src/services/api.js` dosyasında `baseURL` şu şekilde ayarlandı:*
-        ```javascript
-        baseURL: import.meta.env.VITE_API_URL || "http://localhost:8800/api",
-        ```
-        *Bu durumda Vercel'e vereceğiniz değerin sonunda `/api` OLMALIDIR. Örn: `https://writeit-api.onrender.com/api`*
+1.  [Netlify.com](https://www.netlify.com/) adresine gidin ve GitHub hesabınızla giriş yapın.
+2.  **"Add new site"** butonuna tıklayın ve **"Import an existing project"** seçeneğini seçin.
+3.  **GitHub**'ı seçin ve reponuzu bulun.
+4.  **Site settings** ekranında şu ayarları yapın:
+    *   **Base directory:** `client` (Frontend dosyalarınız burada olduğu için).
+    *   **Build command:** `npm run build` (Otomatik gelmeli).
+    *   **Publish directory:** `dist` (Vite varsayılan olarak buraya çıktı verir).
+5.  **"Environment variables"** (veya "Advanced" -> "New Variable") butonuna tıklayın ve şunu ekleyin:
+    *   **Key:** `VITE_API_URL`
+    *   **Value:** Render'dan aldığınız Backend URL'i + `/api` (Örn: `https://writeit-api.onrender.com/api`)
+        *   *Önemli: Kodunuzda `baseURL` ayarı `.../api` ile biten bir adres beklediği için sonuna `/api` eklemeyi unutmayın.*
+6.  **"Deploy site"** butonuna tıklayın.
 
-6.  **"Deploy"** butonuna tıklayın.
+Netlify frontend'inizi derleyip yayınlayacaktır. Size `https://random-name-123456.netlify.app` gibi bir URL verecektir. İsterseniz "Site settings" -> "Change site name" kısmından bu ismi değiştirebilirsiniz (örn: `writeit-app.netlify.app`).
 
-Vercel frontend'inizi derleyip yayınlayacaktır. Size `https://writeit-app.vercel.app` gibi bir URL verecektir.
+*Not: Eğer `client/public/_redirects` dosyası oluşturmadıysanız, Netlify ayarlarından "Build & deploy" -> "Post processing" kısmında "Enable SPA mode" seçeneğini aktif edin.*
 
 ---
 
 ## 4. Son Kontroller
 
-1.  Vercel tarafından verilen Frontend URL'ine gidin.
+1.  Netlify tarafından verilen Frontend URL'ine gidin.
 2.  Kayıt olmayı ve giriş yapmayı deneyin.
 3.  Post oluşturmayı ve görüntülemeyi deneyin.
 
 Eğer "Network Error" veya CORS hatası alırsanız:
-- Backend (`api/index.js`) dosyasındaki CORS ayarlarını kontrol edin. Şu an `origin: true` olduğu için çalışması gerekir.
+- Backend (`api/index.js`) dosyasındaki CORS ayarlarını kontrol edin.
 - `VITE_API_URL`'in doğru girildiğinden emin olun (sonunda `/api` olup olmadığına dikkat edin).
+- Render'daki backend servisinin "Live" olduğundan emin olun.
 
-Tebrikler! Uygulamanız yayında. 🚀
-
+Tebrikler! Uygulamanız Netlify ve Render üzerinde yayında. 🚀
