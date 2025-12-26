@@ -1,0 +1,21 @@
+
+#POST localhost:8800/api/auth/register
+#Content-Type: application/json
+#
+#{
+#  "username": "aaaaa",
+#  "email": "a@11111111.111",
+#  "password": "aaaaaaaa"
+#}
+#
+
+POST localhost:8800/api/posts/create
+cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NDM0ODVmOGIwZTdhYTMyMzZmYzZiMyIsImlhdCI6MTc2NjU5ODcwMiwiZXhwIjoxNzY2NjE2NzAyfQ.dRXCxNFSzLfeHzaSI3VL-L45FqjDDKOBV_Fa2c7pi-w
+Content-Type: application/json
+
+{
+  "title": "aaaaa",
+  "content": "a@11111111.111",
+  "subcommunityName": "aaa"
+}
+###

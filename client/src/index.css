@@ -1,0 +1,61 @@
+body {
+    margin: 0;
+    /* İsteğinize göre sıralı font ailesi: Verdana, yoksa Arial, yoksa Helvetica, hiçbiri yoksa sans-serif */
+    font-family: "Verdana", "Arial", "Helvetica", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+}
+
+/* Form elemanlarının (input, button, textarea) tarayıcı varsayılanı yerine
+   yukarıdaki body fontunu miras almasını sağlar */
+button, input, textarea, select {
+    font-family: inherit;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.app-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.content-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    gap: 24px;
+    padding: 0 20px;
+}
+
+.main-aside {
+    display: none;
+    width: 270px;
+    flex-shrink: 0;
+}
+
+@media (min-width: 960px) {
+    .main-aside {
+        display: block;
+    }
+}
+
+/* Global Dark Mode Overrides for common elements if they don't have specific styles */
+a {
+    color: #006400;
+}
+
+input, textarea, select {
+    background-color: #272729;
+    color: white;
+    border: 1px solid #343536;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #818384;
+}
